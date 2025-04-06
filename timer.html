@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daily Countdown</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    #timer {
+      font-size: 3.5em;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 40px 60px;
+      border-radius: 25px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      transition: 0.4s ease;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="timer" onclick="startNotification()">Tap to enable notification</div>
+
+  <script>
+    let notificationsEnabled = false;
+
+    function updateTimer() {
+      const now = new Date();
+      const minutesPassed = now.getHours() * 60 + now.getMinutes();
+      const totalMinutes = 1440;
+      const minutesLeft = totalMinutes - minutesPassed - 1;
+      const secondsLeft = 60 - now.getSeconds();
+      const display = `${String(minutesLeft)}m ${String(secondsLeft).padStart(2, '0')}s`;
+      document.getElementById("timer").textContent = display;
+
+      if (notificationsEnabled && Notification.permission === "granted" && now.getSeconds() === 0) {
+        new Notification("⏳ Time Left Today", {
+          body: `${display} remaining`,
+          silent: true
+        });
+      }
+    }
+
+    function startNotification() {
+      if (Notification.permission === "granted") {
+        notificationsEnabled = true;
+        alert("Notifications enabled ✅");
+      } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            notificationsEnabled = true;
+            alert("Notifications enabled ✅");
+          } else {
+            alert("Notification permission denied ❌");
+          }
+        });
+      } else {
+        alert("Please allow notifications in your browser settings.");
+      }
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+</body>
+</html>
